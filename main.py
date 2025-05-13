@@ -1,6 +1,3 @@
-def main():
-    print("Hello from inventory-management-system!")
+from database.db import create_tables
 
-
-if __name__ == "__main__":
-    main()
+create_tables()
