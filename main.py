@@ -36,7 +36,7 @@ CARD_BG_COLOR = "#FFFFFF"  # White
 TEXT_COLOR = "#1F2937"  # Dark gray
 MUTED_TEXT_COLOR = "#6B7280"  # Medium gray
 
-# Custom CSS for styling
+# Custom CSS with improved styling
 st.markdown(f"""
 <style>
     /* Base styling */
@@ -370,8 +370,12 @@ st.markdown(f"""
         border-bottom: none;
     }}
     
-    .custom-table tr:hover {{
+    .custom-table tr:nth-child(even) {{
         background-color: #F9FAFB;
+    }}
+    
+    .custom-table tr:hover {{
+        background-color: #F3F4F6;
     }}
     
     /* Badges */
@@ -397,31 +401,6 @@ st.markdown(f"""
     .badge-danger {{
         background-color: rgba(239, 68, 68, 0.1);
         color: #B91C1C;
-    }}
-    
-    /* Tabs */
-    .custom-tabs {{
-        display: flex;
-        border-bottom: 1px solid #E5E7EB;
-        margin-bottom: 1.5rem;
-    }}
-    
-    .custom-tab {{
-        padding: 0.75rem 1rem;
-        cursor: pointer;
-        border-bottom: 2px solid transparent;
-        font-weight: 500;
-        color: {MUTED_TEXT_COLOR};
-        transition: all 0.2s ease;
-    }}
-    
-    .custom-tab:hover {{
-        color: {PRIMARY_COLOR};
-    }}
-    
-    .custom-tab.active {{
-        color: {PRIMARY_COLOR};
-        border-bottom-color: {PRIMARY_COLOR};
     }}
     
     /* Animations */
@@ -469,29 +448,33 @@ st.markdown(f"""
     /* Custom Streamlit overrides */
     .stTextInput > div > div > input {{
         border-radius: 0.375rem;
-        border: 1px solid #E5E7EB;
+        border: 1px solid #C7D2FE;  /* Light indigo */
         padding: 0.5rem 0.75rem;
+        transition: all 0.2s ease;
     }}
     
     .stTextInput > div > div > input:focus {{
         border-color: {PRIMARY_COLOR};
+        background-color: #F9FAFB;
         box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
     }}
     
     .stNumberInput > div > div > input {{
         border-radius: 0.375rem;
-        border: 1px solid #E5E7EB;
+        border: 1px solid #C7D2FE;  /* Light indigo */
         padding: 0.5rem 0.75rem;
+        transition: all 0.2s ease;
     }}
     
     .stNumberInput > div > div > input:focus {{
         border-color: {PRIMARY_COLOR};
+        background-color: #F9FAFB;
         box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
     }}
     
     .stSelectbox > div > div > div {{
         border-radius: 0.375rem;
-        border: 1px solid #E5E7EB;
+        border: 1px solid #C7D2FE;  /* Light indigo */
     }}
     
     .stSelectbox > div > div > div:focus-within {{
@@ -546,8 +529,6 @@ if 'last_action_time' not in st.session_state:
     st.session_state['last_action_time'] = None
 if 'is_premium' not in st.session_state:
     st.session_state['is_premium'] = False
-if 'active_tab' not in st.session_state:
-    st.session_state['active_tab'] = 0
 
 # Helper functions
 def navigate_to(page):
@@ -617,46 +598,33 @@ def custom_header():
     col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 1])
     
     with col1:
-        home_class = "active" if st.session_state['current_page'] == 'home' else ""
-        if st.button(f"{icon('home')} Home", key="nav_home", 
-                    help="Go to home page"):
+        if st.button(f"{icon('home')} Home", key="nav_home", help="Go to home page"):
             navigate_to('home')
     
     with col2:
         if not st.session_state['logged_in']:
-            login_class = "active" if st.session_state['current_page'] == 'login' else ""
-            if st.button(f"{icon('login')} Login", key="nav_login", 
-                        help="Login to your account"):
+            if st.button(f"{icon('login')} Login", key="nav_login", help="Login to your account"):
                 navigate_to('login')
         else:
-            dashboard_class = "active" if st.session_state['current_page'] == 'dashboard' else ""
-            if st.button(f"{icon('dashboard')} Dashboard", key="nav_dashboard", 
-                        help="View your dashboard"):
+            if st.button(f"{icon('dashboard')} Dashboard", key="nav_dashboard", help="View your dashboard"):
                 navigate_to('dashboard')
     
     with col3:
         if not st.session_state['logged_in']:
-            register_class = "active" if st.session_state['current_page'] == 'register' else ""
-            if st.button(f"{icon('register')} Register", key="nav_register", 
-                        help="Create a new account"):
+            if st.button(f"{icon('register')} Register", key="nav_register", help="Create a new account"):
                 navigate_to('register')
         else:
-            inventory_class = "active" if st.session_state['current_page'] == 'inventory' else ""
-            if st.button(f"{icon('inventory')} Inventory", key="nav_inventory", 
-                        help="Manage your inventory"):
+            if st.button(f"{icon('inventory')} Inventory", key="nav_inventory", help="Manage your inventory"):
                 navigate_to('inventory')
     
     with col4:
         if st.session_state['logged_in']:
-            reports_class = "active" if st.session_state['current_page'] == 'reports' else ""
-            if st.button(f"{icon('reports')} Reports", key="nav_reports", 
-                        help="View reports and analytics"):
+            if st.button(f"{icon('reports')} Reports", key="nav_reports", help="View reports and analytics"):
                 navigate_to('reports')
     
     with col5:
         if st.session_state['logged_in']:
-            if st.button(f"{icon('logout')} Logout", key="nav_logout", 
-                        help="Log out of your account"):
+            if st.button(f"{icon('logout')} Logout", key="nav_logout", help="Log out of your account"):
                 logout()
     
     st.markdown("""
@@ -714,28 +682,20 @@ def custom_button(label, type="primary", icon_name=None, key=None, help=None):
 def show_notifications():
     if st.session_state['show_success']:
         custom_alert(st.session_state['show_success'], "success")
-        # Auto-clear message after 3 seconds
         if st.session_state['last_action_time'] and time.time() - st.session_state['last_action_time'] > 3:
             st.session_state['show_success'] = None
     
     if st.session_state['show_error']:
         custom_alert(st.session_state['show_error'], "error")
-        # Auto-clear message after 3 seconds
         if st.session_state['last_action_time'] and time.time() - st.session_state['last_action_time'] > 3:
             st.session_state['show_error'] = None
 
 # Main app structure
 def main():
-    # Custom header with navigation
     custom_header()
-    
-    # Show notifications
     show_notifications()
-    
-    # Main content container
     st.markdown('<div class="main-container">', unsafe_allow_html=True)
     
-    # Page content based on current page
     if st.session_state['current_page'] == 'home':
         render_home_page()
     elif st.session_state['current_page'] == 'login':
@@ -749,7 +709,6 @@ def main():
     elif st.session_state['current_page'] == 'reports' and st.session_state['logged_in']:
         render_reports_page()
     else:
-        # If user is not logged in but tries to access protected pages
         if st.session_state['current_page'] in ['dashboard', 'inventory', 'reports'] and not st.session_state['logged_in']:
             custom_alert("🔒 Please login to access this page", "warning")
             render_login_page()
@@ -758,7 +717,6 @@ def main():
 
 # Page renderers
 def render_home_page():
-    # Hero section
     st.markdown(f"""
     <div class="card" style="background: linear-gradient(135deg, {PRIMARY_COLOR}, {SECONDARY_COLOR}); color: white;">
         <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -784,7 +742,6 @@ def render_home_page():
     </div>
     """, unsafe_allow_html=True)
     
-    # Features section
     st.markdown("<h2 style='text-align: center; margin: 2rem 0;'>Key Features</h2>", unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns(3)
@@ -828,7 +785,6 @@ def render_home_page():
         </div>
         """, unsafe_allow_html=True)
     
-    # Call to action
     st.markdown(f"""
     <div class="card" style="text-align: center; margin-top: 2rem;">
         <h2 style="margin-bottom: 1rem;">Ready to Get Started?</h2>
@@ -863,7 +819,7 @@ def render_login_page():
                 show_error("Please enter both username and password")
             else:
                 with st.spinner("Logging in..."):
-                    time.sleep(0.5)  # Simulate processing
+                    time.sleep(0.5)
                     if login_user(username, password):
                         st.session_state['logged_in'] = True
                         st.session_state['username'] = username
@@ -906,10 +862,9 @@ def render_register_page():
                 show_error("Passwords do not match")
             else:
                 with st.spinner("Creating your account..."):
-                    time.sleep(0.5)  # Simulate processing
+                    time.sleep(0.5)
                     if register_user(username, password):
                         show_success("Account created successfully!")
-                        # Auto-login after registration
                         st.session_state['logged_in'] = True
                         st.session_state['username'] = username
                         navigate_to('dashboard')
@@ -932,7 +887,6 @@ def render_dashboard_page():
     </div>
     """, unsafe_allow_html=True)
     
-    # Dashboard stats
     products = get_all_products()
     total_products = len(products)
     total_items = sum(p.quantity for p in products) if products else 0
@@ -957,7 +911,6 @@ def render_dashboard_page():
     
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Recent activity and charts
     col1, col2 = st.columns([2, 1])
     
     with col1:
@@ -969,11 +922,9 @@ def render_dashboard_page():
         """, unsafe_allow_html=True)
         
         if products:
-            # Create data for visualization
             product_names = [p.name for p in products]
             quantities = [p.quantity for p in products]
             
-            # Create a bar chart
             fig = px.bar(
                 x=product_names, 
                 y=quantities,
@@ -987,17 +938,8 @@ def render_dashboard_page():
                 plot_bgcolor='rgba(0,0,0,0)',
                 paper_bgcolor='rgba(0,0,0,0)',
                 margin=dict(l=20, r=20, t=20, b=20),
-                xaxis=dict(
-                    showgrid=False,
-                    showline=True,
-                    linecolor='#E5E7EB'
-                ),
-                yaxis=dict(
-                    showgrid=True,
-                    gridcolor='#E5E7EB',
-                    showline=True,
-                    linecolor='#E5E7EB'
-                )
+                xaxis=dict(showgrid=False, showline=True, linecolor='#E5E7EB'),
+                yaxis=dict(showgrid=True, gridcolor='#E5E7EB', showline=True, linecolor='#E5E7EB')
             )
             
             st.plotly_chart(fig, use_container_width=True)
@@ -1036,7 +978,6 @@ def render_dashboard_page():
         
         st.markdown('</div></div>', unsafe_allow_html=True)
     
-    # Quick actions
     st.markdown(f"""
     <h2 style="margin: 1.5rem 0 1rem 0;">Quick Actions</h2>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
@@ -1091,7 +1032,6 @@ def render_dashboard_page():
         
         if st.button("Add Product", key="quick_add_product", use_container_width=True):
             navigate_to('inventory')
-            st.session_state['active_tab'] = 1  # Set to "Add Product" tab
     
     with col4:
         st.markdown(f"""
@@ -1123,28 +1063,16 @@ def render_inventory_page():
     <p style="color: #6B7280; margin-bottom: 1.5rem;">Add, update, and manage your products</p>
     """, unsafe_allow_html=True)
     
-    # Custom tabs
-    tabs = ["📋 Product List", "➕ Add Product", "✏️ Update Stock", "🗑️ Delete Product"]
+    # Using Streamlit tabs instead of custom tabs
+    tab1, tab2, tab3, tab4 = st.tabs(["📋 Product List", "➕ Add Product", "✏️ Update Stock", "🗑️ Delete Product"])
     
-    st.markdown('<div class="custom-tabs">', unsafe_allow_html=True)
-    cols = st.columns(len(tabs))
-    
-    for i, (col, tab) in enumerate(zip(cols, tabs)):
-        with col:
-            active_class = "active" if st.session_state['active_tab'] == i else ""
-            if st.button(tab, key=f"tab_{i}", use_container_width=True):
-                st.session_state['active_tab'] = i
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Tab content
-    if st.session_state['active_tab'] == 0:  # Product List
+    with tab1:
         render_product_list_tab()
-    elif st.session_state['active_tab'] == 1:  # Add Product
+    with tab2:
         render_add_product_tab()
-    elif st.session_state['active_tab'] == 2:  # Update Stock
+    with tab3:
         render_update_stock_tab()
-    elif st.session_state['active_tab'] == 3:  # Delete Product
+    with tab4:
         render_delete_product_tab()
 
 def render_product_list_tab():
@@ -1155,7 +1083,6 @@ def render_product_list_tab():
         </div>
     """, unsafe_allow_html=True)
     
-    # Search functionality
     search_query = st.text_input("🔍 Search Products", placeholder="Enter product name...", key="product_search")
     
     products = get_all_products()
@@ -1163,7 +1090,6 @@ def render_product_list_tab():
         products = [p for p in products if search_query.lower() in p.name.lower()]
     
     if products:
-        # Convert to DataFrame for better display
         data = {
             "ID": [p.id for p in products],
             "Product Name": [p.name for p in products],
@@ -1175,7 +1101,6 @@ def render_product_list_tab():
         
         df = pd.DataFrame(data)
         
-        # Apply styling to the dataframe
         def highlight_low_stock(val):
             if val == "Low Stock":
                 return f'background-color: {ERROR_COLOR}20; color: {ERROR_COLOR}; border-radius: 9999px; padding: 0.25rem 0.5rem;'
@@ -1183,13 +1108,9 @@ def render_product_list_tab():
                 return f'background-color: {SUCCESS_COLOR}20; color: {SUCCESS_COLOR}; border-radius: 9999px; padding: 0.25rem 0.5rem;'
             return ""
         
-        # Apply the styling
         styled_df = df.style.applymap(highlight_low_stock, subset=['Status'])
-        
-        # Display the styled dataframe
         st.dataframe(styled_df, use_container_width=True)
         
-        # Export option
         col1, col2 = st.columns([1, 5])
         with col1:
             if st.button("📥 Export to CSV", key="export_csv"):
@@ -1226,8 +1147,6 @@ def render_add_product_tab():
         price = st.number_input("Price ($)", min_value=0.0, format="%.2f", key="add_price")
     
     description = st.text_area("Description (Optional)", height=100, key="add_description", placeholder="Enter product description")
-    
-    # Product image upload (placeholder)
     st.file_uploader("Product Image (Optional)", type=["jpg", "jpeg", "png"], key="add_image")
     
     if st.button("Add Product", key="btn_add_product", use_container_width=True):
@@ -1237,10 +1156,9 @@ def render_add_product_tab():
             show_error("Quantity and price must be positive values")
         else:
             with st.spinner("Adding product..."):
-                time.sleep(0.5)  # Simulate processing
+                time.sleep(0.5)
                 add_product(name, quantity, price, description)
                 show_success(f"Added {name} successfully!")
-                # Clear form fields
                 st.session_state["add_name"] = ""
                 st.session_state["add_quantity"] = 0
                 st.session_state["add_price"] = 0.0
@@ -1262,7 +1180,6 @@ def render_update_stock_tab():
         selected_product = st.selectbox("Select Product", list(product_options.keys()), key="update_product")
         product_id = product_options[selected_product]
         
-        # Get current quantity for the selected product
         current_quantity = next((p.quantity for p in products if p.id == product_id), 0)
         
         st.markdown(f"""
@@ -1277,21 +1194,21 @@ def render_update_stock_tab():
         with col1:
             if st.button("➕ Add Stock", key="btn_add_stock", use_container_width=True):
                 with st.spinner("Updating stock..."):
-                    time.sleep(0.5)  # Simulate processing
+                    time.sleep(0.5)
                     update_stock(product_id, current_quantity + 10)
                     show_success(f"Added 10 units to stock")
         
         with col2:
             if st.button("➖ Remove Stock", key="btn_remove_stock", use_container_width=True):
                 with st.spinner("Updating stock..."):
-                    time.sleep(0.5)  # Simulate processing
+                    time.sleep(0.5)
                     new_qty = max(0, current_quantity - 10)
                     update_stock(product_id, new_qty)
                     show_success(f"Removed 10 units from stock")
         
         if st.button("Update Stock", key="btn_update_stock", use_container_width=True):
             with st.spinner("Updating stock..."):
-                time.sleep(0.5)  # Simulate processing
+                time.sleep(0.5)
                 update_stock(product_id, new_quantity)
                 show_success(f"Stock updated to {new_quantity}")
     else:
@@ -1313,7 +1230,6 @@ def render_delete_product_tab():
         selected_product = st.selectbox("Select Product to Delete", list(product_options.keys()), key="delete_product")
         product_id = product_options[selected_product]
         
-        # Get product details
         product = next((p for p in products if p.id == product_id), None)
         
         if product:
@@ -1351,7 +1267,7 @@ def render_delete_product_tab():
             
             if st.button("Delete Product", key="btn_delete_product", disabled=not confirm, use_container_width=True):
                 with st.spinner("Deleting product..."):
-                    time.sleep(0.5)  # Simulate processing
+                    time.sleep(0.5)
                     delete_product(product_id)
                     show_success(f"Product deleted successfully")
                     st.session_state["confirm_delete"] = False
@@ -1373,12 +1289,10 @@ def render_reports_page():
     if not products:
         st.info("No products available to generate reports")
     else:
-        # Create data for visualization
         product_names = [p.name for p in products]
         quantities = [p.quantity for p in products]
         values = [p.quantity * p.price for p in products]
         
-        # Tabs for different reports
         tab1, tab2, tab3 = st.tabs(["📊 Stock Levels", "💰 Inventory Value", "📉 Low Stock Items"])
         
         with tab1:
@@ -1389,7 +1303,6 @@ def render_reports_page():
                 </div>
             """, unsafe_allow_html=True)
             
-            # Create a bar chart with improved styling
             fig = px.bar(
                 x=product_names, 
                 y=quantities,
@@ -1403,22 +1316,12 @@ def render_reports_page():
                 plot_bgcolor='rgba(0,0,0,0)',
                 paper_bgcolor='rgba(0,0,0,0)',
                 margin=dict(l=20, r=20, t=20, b=20),
-                xaxis=dict(
-                    showgrid=False,
-                    showline=True,
-                    linecolor='#E5E7EB'
-                ),
-                yaxis=dict(
-                    showgrid=True,
-                    gridcolor='#E5E7EB',
-                    showline=True,
-                    linecolor='#E5E7EB'
-                )
+                xaxis=dict(showgrid=False, showline=True, linecolor='#E5E7EB'),
+                yaxis=dict(showgrid=True, gridcolor='#E5E7EB', showline=True, linecolor='#E5E7EB')
             )
             
             st.plotly_chart(fig, use_container_width=True)
             
-            # Data table
             st.markdown("<h4>Stock Levels Data</h4>", unsafe_allow_html=True)
             stock_data = pd.DataFrame({
                 "Product": product_names,
@@ -1438,7 +1341,6 @@ def render_reports_page():
                 </div>
             """, unsafe_allow_html=True)
             
-            # Create a pie chart with improved styling
             fig = px.pie(
                 names=product_names,
                 values=values,
@@ -1451,37 +1353,21 @@ def render_reports_page():
                 plot_bgcolor='rgba(0,0,0,0)',
                 paper_bgcolor='rgba(0,0,0,0)',
                 margin=dict(l=20, r=20, t=20, b=20),
-                legend=dict(
-                    orientation="h",
-                    yanchor="bottom",
-                    y=-0.2,
-                    xanchor="center",
-                    x=0.5
-                )
+                legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="center", x=0.5)
             )
             
-            fig.update_traces(
-                textinfo='percent+label',
-                textposition='inside',
-                hoverinfo='label+percent+value'
-            )
+            fig.update_traces(textinfo='percent+label', textposition='inside', hoverinfo='label+percent+value')
             
             st.plotly_chart(fig, use_container_width=True)
             
-            # Value summary
             col1, col2, col3 = st.columns(3)
-            
             with col1:
                 st.metric("Total Value", f"${sum(values):.2f}", f"{random.uniform(2, 8):.1f}%")
-            
             with col2:
                 st.metric("Average Value", f"${sum(values)/len(values):.2f}", f"{random.uniform(-2, 5):.1f}%")
-            
             with col3:
-                st.metric("Highest Value", f"${max(values):.2f}", f"{random.uniform(0, 10):.1f}%") 
                 st.metric("Highest Value", f"${max(values):.2f}", f"{random.uniform(0, 10):.1f}%")
             
-            # Data table
             st.markdown("<h4>Value Distribution Data</h4>", unsafe_allow_html=True)
             value_data = pd.DataFrame({
                 "Product": product_names,
@@ -1505,11 +1391,9 @@ def render_reports_page():
             low_stock_products = [p for p in products if p.quantity < 10]
             
             if low_stock_products:
-                # Create data for visualization
                 low_stock_names = [p.name for p in low_stock_products]
                 low_stock_quantities = [p.quantity for p in low_stock_products]
                 
-                # Create a horizontal bar chart with improved styling
                 fig = px.bar(
                     y=low_stock_names,
                     x=low_stock_quantities,
@@ -1524,38 +1408,17 @@ def render_reports_page():
                     plot_bgcolor='rgba(0,0,0,0)',
                     paper_bgcolor='rgba(0,0,0,0)',
                     margin=dict(l=20, r=20, t=20, b=20),
-                    xaxis=dict(
-                        showgrid=True,
-                        gridcolor='#E5E7EB',
-                        showline=True,
-                        linecolor='#E5E7EB'
-                    ),
-                    yaxis=dict(
-                        showgrid=False,
-                        showline=True,
-                        linecolor='#E5E7EB'
-                    )
+                    xaxis=dict(showgrid=True, gridcolor='#E5E7EB', showline=True, linecolor='#E5E7EB'),
+                    yaxis=dict(showgrid=False, showline=True, linecolor='#E5E7EB')
                 )
                 
-                # Add a vertical line for the threshold
-                fig.add_shape(
-                    type="line",
-                    x0=10, y0=-0.5,
-                    x1=10, y1=len(low_stock_names) - 0.5,
-                    line=dict(color="red", width=2, dash="dash")
-                )
-                
-                fig.add_annotation(
-                    x=10, y=len(low_stock_names),
-                    text="Low Stock Threshold",
-                    showarrow=False,
-                    yshift=10,
-                    font=dict(color="red")
-                )
+                fig.add_shape(type="line", x0=10, y0=-0.5, x1=10, y1=len(low_stock_names) - 0.5,
+                              line=dict(color="red", width=2, dash="dash"))
+                fig.add_annotation(x=10, y=len(low_stock_names), text="Low Stock Threshold",
+                                 showarrow=False, yshift=10, font=dict(color="red"))
                 
                 st.plotly_chart(fig, use_container_width=True)
                 
-                # Data table
                 st.markdown("<h4>Low Stock Items</h4>", unsafe_allow_html=True)
                 low_stock_data = pd.DataFrame({
                     "Product": [p.name for p in low_stock_products],
@@ -1566,7 +1429,6 @@ def render_reports_page():
                 
                 st.dataframe(low_stock_data, use_container_width=True)
                 
-                # Reorder recommendations
                 st.markdown(f"""
                 <div style="background-color: {WARNING_COLOR}10; border: 1px solid {WARNING_COLOR}20; border-radius: 0.375rem; padding: 1rem; margin-top: 1rem;">
                     <div style="display: flex; align-items: center; gap: 0.5rem; color: {WARNING_COLOR}; margin-bottom: 0.5rem;">
@@ -1586,15 +1448,11 @@ def render_reports_page():
                     </li>
                     """, unsafe_allow_html=True)
                 
-                st.markdown("""
-                    </ul>
-                </div>
-                """, unsafe_allow_html=True)
+                st.markdown("</ul></div>", unsafe_allow_html=True)
             else:
                 st.success("No low stock items found. Your inventory is in good shape!")
             
             st.markdown('</div>', unsafe_allow_html=True)
 
-# Run the app
 if __name__ == "__main__":
     main()
