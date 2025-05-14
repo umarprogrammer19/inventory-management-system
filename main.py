@@ -1,7 +1,6 @@
 import streamlit as st
 import time
 import pandas as pd
-import plotly.express as px
 from datetime import datetime
 from services.auth_service import register_user, login_user
 from services.inventory_service import (
@@ -258,8 +257,7 @@ def render_dashboard_page():
                 "Product": [p.name for p in products],
                 "Quantity": [p.quantity for p in products]
             })
-            fig = px.bar(df, x="Product", y="Quantity")
-            st.plotly_chart(fig, use_container_width=True)
+            st.dataframe(df)
         else:
             st.info("Add products to see your inventory overview")
     
@@ -407,24 +405,22 @@ def render_reports_page():
     
     with tab1:
         st.subheader("Stock Levels")
-        df = pd.DataFrame({
-            "Product": [p.name for p in products],
-            "Quantity": [p.quantity for p in products]
-        })
-        fig = px.bar(df, x="Product", y="Quantity")
-        st.plotly_chart(fig, use_container_width=True)
-        st.dataframe(df, use_container_width=True)
+        if products:
+            df = pd.DataFrame({
+                "Product": [p.name for p in products],
+                "Quantity": [p.quantity for p in products]
+            })
+            st.dataframe(df)
     
     with tab2:
         st.subheader("Inventory Value")
-        values = [p.quantity * p.price for p in products]
-        df = pd.DataFrame({
-            "Product": [p.name for p in products],
-            "Value": values
-        })
-        fig = px.pie(df, names="Product", values="Value")
-        st.plotly_chart(fig, use_container_width=True)
-        st.dataframe(df, use_container_width=True)
+        if products:
+            values = [p.quantity * p.price for p in products]
+            df = pd.DataFrame({
+                "Product": [p.name for p in products],
+                "Value": values
+            })
+            st.dataframe(df)
     
     with tab3:
         st.subheader("Low Stock")
@@ -434,11 +430,9 @@ def render_reports_page():
                 "Product": [p.name for p in low_stock],
                 "Quantity": [p.quantity for p in low_stock]
             })
-            fig = px.bar(df, y="Product", x="Quantity", orientation='h')
-            st.plotly_chart(fig, use_container_width=True)
-            st.dataframe(df, use_container_width=True)
+            st.dataframe(df)
         else:
             st.success("No low stock items found")
 
 if __name__ == "__main__":
-    main()  
+    main()
