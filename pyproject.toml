@@ -8,5 +8,7 @@ dependencies = [
     "bcrypt>=4.3.0",
     "fpdf>=1.7.2",
     "pandas>=2.2.3",
+    "plotly",
+    "sqlite3",
     "streamlit>=1.45.1",
 ]
